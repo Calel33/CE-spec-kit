@@ -482,8 +482,40 @@ def download_template_from_github(ai_assistant: str, download_dir: Path, *, scri
 
     asset = matching_assets[0] if matching_assets else None
 
+    # Backwards compatibility: fall back to legacy Spec Kit archives when CE Kit packages are missing
+    asset = matching_assets[0] if matching_assets else None
+
     if asset is None:
-        console.print(f"[red]No matching release asset found[/red] for [bold]{ai_assistant}[/bold] (expected pattern: [bold]{pattern}[/bold])")
+        legacy_pattern = f"spec-kit-template-{ai_assistant}-{script_type}"
+        legacy_assets = [
+            asset for asset in assets
+            if legacy_pattern in asset["name"] and asset["name"].endswith(".zip")
+        ]
+        asset = legacy_assets[0] if legacy_assets else None
+        if asset is not None and verbose:
+            console.print(
+                f"[yellow]No CE Kit asset found; using legacy Spec Kit asset:[/yellow] {asset['name']}"
+            )
+
+    if asset is None:
+        asset_names = [a.get('name', '?') for a in assets]
+        console.print(f"[red]No matching release asset found[/red] for [bold]{ai_assistant}[/bold].")
+        console.print(Panel(
+            "\n".join(asset_names) or "(no assets)",
+            title="Available Assets",
+            border_style="yellow"
+        ))
+        console.print(
+            "[yellow]Generate the CE Kit template archives by running `.github/workflows/scripts/create-release-packages.sh <version>` and publish the resulting `ce-kit-template-*` assets, then rerun `specify init`.[/yellow]"
+        )
+        raise typer.Exit(1)
+        if asset is not None and verbose:
+            console.print(
+                f"[yellow]No Context Engineering Kit asset found; using legacy Spec Kit template:[/yellow] {asset['name']}"
+            )
+
+    if asset is None:
+        console.print(f"[red]No matching release asset found[/red] for [bold]{ai_assistant}[/bold] (expected patterns: [bold]{pattern}[/bold] or Spec Kit legacy)")
         asset_names = [a.get('name', '?') for a in assets]
         console.print(Panel("\n".join(asset_names) or "(no assets)", title="Available Assets", border_style="yellow"))
         raise typer.Exit(1)

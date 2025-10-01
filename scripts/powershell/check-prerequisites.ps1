@@ -117,9 +117,9 @@ if ($Json) {
     Write-Output "WORKFLOW:$($paths.WORKFLOW)"
     Write-Output "AVAILABLE_DOCS:"
     foreach ($doc in $docs) {
-        Write-Output "  ✓ $doc"
+        Write-Output "  [OK] $doc"
     }
     if ($IncludeTasks -and -not (Test-Path $paths.TASKS_FILE)) {
-        Write-Output "  ✗ tasks.md"
+        Write-Output "  [MISSING] tasks.md"
     }
 }

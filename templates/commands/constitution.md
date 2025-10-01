@@ -1,5 +1,8 @@
----
+﻿---
 description: Create or update the project constitution from interactive or provided principle inputs, ensuring all dependent templates stay in sync.
+scripts:
+  sh: echo "No script required"
+  ps: Write-Output "No script required"
 ---
 
 The user input to you can be provided directly by the agent or as a command argument - you **MUST** consider it before proceeding with the prompt (if not empty).
@@ -27,31 +30,31 @@ Follow this execution flow:
    - If version bump type ambiguous, propose reasoning before finalizing.
 
 3. Draft the updated constitution content:
-   - Replace every placeholder with concrete text (no bracketed tokens left except intentionally retained template slots that the project has chosen not to define yet—explicitly justify any left).
+   - Replace every placeholder with concrete text (no bracketed tokens left except intentionally retained template slots that the project has chosen not to define yetâ€”explicitly justify any left).
    - Preserve heading hierarchy and comments can be removed once replaced unless they still add clarifying guidance.
-   - Ensure each Principle section: succinct name line, paragraph (or bullet list) capturing non‑negotiable rules, explicit rationale if not obvious.
+   - Ensure each Principle section: succinct name line, paragraph (or bullet list) capturing nonâ€‘negotiable rules, explicit rationale if not obvious.
    - Ensure Governance section lists amendment procedure, versioning policy, and compliance review expectations.
 
 4. Consistency propagation checklist (convert prior checklist into active validations):
    - Read `/templates/plan-template.md` and ensure any "Constitution Check" or rules align with updated principles.
-   - Read `/templates/spec-template.md` for scope/requirements alignment—update if constitution adds/removes mandatory sections or constraints.
+   - Read `/templates/spec-template.md` for scope/requirements alignmentâ€”update if constitution adds/removes mandatory sections or constraints.
    - Read `/templates/tasks-template.md` and ensure task categorization reflects new or removed principle-driven task types (e.g., observability, versioning, testing discipline).
    - Read each command file in `/templates/commands/*.md` (including this one) to verify no outdated references (agent-specific names like CLAUDE only) remain when generic guidance is required.
    - Read any runtime guidance docs (e.g., `README.md`, `docs/quickstart.md`, or agent-specific guidance files if present). Update references to principles changed.
 
 5. Produce a Sync Impact Report (prepend as an HTML comment at top of the constitution file after update):
-   - Version change: old → new
-   - List of modified principles (old title → new title if renamed)
+   - Version change: old â†’ new
+   - List of modified principles (old title â†’ new title if renamed)
    - Added sections
    - Removed sections
-   - Templates requiring updates (✅ updated / ⚠ pending) with file paths
+   - Templates requiring updates (âœ… updated / âš  pending) with file paths
    - Follow-up TODOs if any placeholders intentionally deferred.
 
 6. Validation before final output:
    - No remaining unexplained bracket tokens.
    - Version line matches report.
    - Dates ISO format YYYY-MM-DD.
-   - Principles are declarative, testable, and free of vague language ("should" → replace with MUST/SHOULD rationale where appropriate).
+   - Principles are declarative, testable, and free of vague language ("should" â†’ replace with MUST/SHOULD rationale where appropriate).
 
 7. Write the completed constitution back to `/memory/constitution.md` (overwrite).
 
@@ -71,3 +74,4 @@ If the user supplies partial updates (e.g., only one principle revision), still 
 If critical info missing (e.g., ratification date truly unknown), insert `TODO(<FIELD_NAME>): explanation` and include in the Sync Impact Report under deferred items.
 
 Do not create a new template; always operate on the existing `/memory/constitution.md` file.
+
