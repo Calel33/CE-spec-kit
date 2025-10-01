@@ -26,10 +26,16 @@ Relies on common helper functions in common.ps1
 param(
     [Parameter(Position=0)]
     [ValidateSet('claude','gemini','copilot','cursor','qwen','opencode','codex','windsurf','kilocode','auggie','roo')]
-    [string]$AgentType
+    [string]$AgentType,
+    [switch]$Help
 )
 
 $ErrorActionPreference = 'Stop'
+
+if ($Help) {
+    Get-Help -Full $MyInvocation.MyCommand.Path
+    exit 0
+}
 
 # Import common helpers
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -76,7 +82,7 @@ function Write-Success {
         [Parameter(Mandatory=$true)]
         [string]$Message
     )
-    Write-Host "$([char]0x2713) $Message" 
+    Write-Host "[OK] $Message" 
 }
 
 function Write-WarningMsg { 

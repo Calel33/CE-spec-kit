@@ -16,8 +16,8 @@ $featureDesc = ($FeatureDescription -join ' ').Trim()
 
 . (Join-Path $PSScriptRoot 'common.ps1')
 
-$repoRoot = Get-RepoRoot
-$workflow = Get-Workflow -RepoRoot $repoRoot
+$repoRoot = ([string](Get-RepoRoot)).Trim()
+$workflow = ([string](Get-Workflow -RepoRoot $repoRoot)).Trim()
 $hasGit = Test-HasGit
 Set-Location $repoRoot
 
@@ -33,9 +33,9 @@ if ($hasGit) {
 
 if ($highest -eq 0) {
     $candidateDirs = @(
-        Join-Path $repoRoot 'specs',
-        Join-Path $repoRoot 'context-eng/prp',
-        Join-Path $repoRoot 'context-eng/all-in-one'
+        [System.IO.Path]::Combine($repoRoot, 'specs'),
+        [System.IO.Path]::Combine($repoRoot, 'context-eng', 'prp'),
+        [System.IO.Path]::Combine($repoRoot, 'context-eng', 'all-in-one')
     )
     foreach ($dir in $candidateDirs) {
         if (-not (Test-Path $dir)) { continue }
@@ -66,8 +66,8 @@ if ($hasGit) {
     Write-Warning "[cek] Warning: Git repository not detected; skipped branch creation for $branchName"
 }
 
-$contextDir = Join-Path $repoRoot '.context-eng'
-$checklistTemplate = Join-Path $contextDir 'checklists/full-implementation-checklist.md'
+$contextDir = [System.IO.Path]::Combine($repoRoot, '.context-eng')
+$checklistTemplate = [System.IO.Path]::Combine($contextDir, 'checklists', 'full-implementation-checklist.md')
 
 $featureDir = $null
 $primaryTemplate = $null
@@ -80,50 +80,50 @@ $initialFile = $null
 
 switch ($workflow) {
     'free-style' {
-        $featureDir = Join-Path $repoRoot "specs/$branchName"
-        $primaryTemplate = Join-Path $contextDir 'workflows/free-style/templates/context-spec-template.md'
-        $primaryFile = Join-Path $featureDir 'context-spec.md'
-        $planFile = Join-Path $featureDir 'plan.md'
-        $researchFile = Join-Path $featureDir 'research.md'
-        $tasksFile = Join-Path $featureDir 'tasks.md'
+        $featureDir = [System.IO.Path]::Combine($repoRoot, 'specs', $branchName)
+        $primaryTemplate = [System.IO.Path]::Combine($contextDir, 'workflows', 'free-style', 'templates', 'context-spec-template.md')
+        $primaryFile = [System.IO.Path]::Combine($featureDir, 'context-spec.md')
+        $planFile = [System.IO.Path]::Combine($featureDir, 'plan.md')
+        $researchFile = [System.IO.Path]::Combine($featureDir, 'research.md')
+        $tasksFile = [System.IO.Path]::Combine($featureDir, 'tasks.md')
     }
     'prp' {
-        $featureDir = Join-Path $repoRoot "context-eng/prp/$branchName"
-        $primaryTemplate = Join-Path $contextDir 'workflows/prp/templates/initial-template.md'
-        $primaryFile = Join-Path $repoRoot 'PRPs/INITIAL.md'
-        $prpFile = Join-Path $repoRoot "PRPs/$branchName.md"
-        $planFile = Join-Path $featureDir 'plan.md'
-        $researchFile = Join-Path $featureDir 'research.md'
-        $tasksFile = Join-Path $featureDir 'tasks.md'
+        $featureDir = [System.IO.Path]::Combine($repoRoot, 'context-eng', 'prp', $branchName)
+        $primaryTemplate = [System.IO.Path]::Combine($contextDir, 'workflows', 'prp', 'templates', 'initial-template.md')
+        $primaryFile = [System.IO.Path]::Combine($repoRoot, 'PRPs', 'INITIAL.md')
+        $prpFile = [System.IO.Path]::Combine($repoRoot, 'PRPs', "$branchName.md")
+        $planFile = [System.IO.Path]::Combine($featureDir, 'plan.md')
+        $researchFile = [System.IO.Path]::Combine($featureDir, 'research.md')
+        $tasksFile = [System.IO.Path]::Combine($featureDir, 'tasks.md')
         $initialFile = $primaryFile
     }
     'all-in-one' {
-        $featureDir = Join-Path $repoRoot "context-eng/all-in-one/$branchName"
-        $primaryTemplate = Join-Path $contextDir 'workflows/all-in-one/templates/all-in-one-template.md'
-        $primaryFile = Join-Path $featureDir 'record.md'
-        $planFile = Join-Path $featureDir 'plan.md'
-        $researchFile = Join-Path $featureDir 'research.md'
-        $tasksFile = Join-Path $featureDir 'tasks.md'
+        $featureDir = [System.IO.Path]::Combine($repoRoot, 'context-eng', 'all-in-one', $branchName)
+        $primaryTemplate = [System.IO.Path]::Combine($contextDir, 'workflows', 'all-in-one', 'templates', 'all-in-one-template.md')
+        $primaryFile = [System.IO.Path]::Combine($featureDir, 'record.md')
+        $planFile = [System.IO.Path]::Combine($featureDir, 'plan.md')
+        $researchFile = [System.IO.Path]::Combine($featureDir, 'research.md')
+        $tasksFile = [System.IO.Path]::Combine($featureDir, 'tasks.md')
     }
     default {
-        $featureDir = Join-Path $repoRoot "specs/$branchName"
-        $primaryTemplate = Join-Path $contextDir 'workflows/free-style/templates/context-spec-template.md'
-        $primaryFile = Join-Path $featureDir 'context-spec.md'
-        $planFile = Join-Path $featureDir 'plan.md'
-        $researchFile = Join-Path $featureDir 'research.md'
-        $tasksFile = Join-Path $featureDir 'tasks.md'
+        $featureDir = [System.IO.Path]::Combine($repoRoot, 'specs', $branchName)
+        $primaryTemplate = [System.IO.Path]::Combine($contextDir, 'workflows', 'free-style', 'templates', 'context-spec-template.md')
+        $primaryFile = [System.IO.Path]::Combine($featureDir, 'context-spec.md')
+        $planFile = [System.IO.Path]::Combine($featureDir, 'plan.md')
+        $researchFile = [System.IO.Path]::Combine($featureDir, 'research.md')
+        $tasksFile = [System.IO.Path]::Combine($featureDir, 'tasks.md')
     }
 }
 
 New-Item -ItemType Directory -Path $featureDir -Force | Out-Null
-[System.IO.Directory]::CreateDirectory((Split-Path $primaryFile)) | Out-Null
-[System.IO.Directory]::CreateDirectory((Split-Path $planFile)) | Out-Null
-[System.IO.Directory]::CreateDirectory((Split-Path $researchFile)) | Out-Null
-[System.IO.Directory]::CreateDirectory((Split-Path $tasksFile)) | Out-Null
+[System.IO.Directory]::CreateDirectory((Split-Path $primaryFile -Parent)) | Out-Null
+[System.IO.Directory]::CreateDirectory((Split-Path $planFile -Parent)) | Out-Null
+[System.IO.Directory]::CreateDirectory((Split-Path $researchFile -Parent)) | Out-Null
+[System.IO.Directory]::CreateDirectory((Split-Path $tasksFile -Parent)) | Out-Null
 
 if ($workflow -eq 'prp') {
-    [System.IO.Directory]::CreateDirectory((Split-Path $prpFile)) | Out-Null
-    $prpTemplate = Join-Path $contextDir 'workflows/prp/templates/prp-template.md'
+    [System.IO.Directory]::CreateDirectory((Split-Path $prpFile -Parent)) | Out-Null
+    $prpTemplate = [System.IO.Path]::Combine($contextDir, 'workflows', 'prp', 'templates', 'prp-template.md')
     if ((-not (Test-Path $prpFile)) -and (Test-Path $prpTemplate)) {
         Copy-Item $prpTemplate $prpFile
     }

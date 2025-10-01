@@ -1,0 +1,8 @@
+{
+  "workflow": "prp",
+  "ai_assistant": "windsurf",
+  "script_type": "ps",
+  "version": "0.0.18",
+  "initialized_at": "2025-09-28T05:47:52Z",
+  "project_name": "context-kit-demo"
+}

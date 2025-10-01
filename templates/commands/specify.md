@@ -1,3 +1,4 @@
+---
 description: Bootstrap the selected context engineering workflow for a new feature and populate the primary artifact.
 scripts:
   sh: scripts/bash/create-new-feature.sh --json "{ARGS}"

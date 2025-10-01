@@ -1,4 +1,4 @@
-![Context Engineering Kit](./media/logo_small.webp)
+﻿![Context Engineering Kit](./media/logo_small.webp)
 
 # 🧭 Context Engineering Kit
 
@@ -44,30 +44,30 @@ Switch workflows at init time with --workflow and the CLI will scaffold director
 
 The CLI is published as specify-cli. Use [uv](https://github.com/astral-sh/uv) for fastest results:
 
-`ash
+```bash
 uv tool install specify-cli --from git+https://github.com/Calel33/CE-spec-kit.git
 # or run once without installing
 uvx --from git+https://github.com/Calel33/CE-spec-kit.git specify -- --help
-`
+```
 
 Verify installation:
 
-`ash
+```bash
 specify --help
 specify check
-`
+```
 
 ## Initialize a Project
 
 Provision a brand-new project or retrofit an existing directory:
 
-`ash
+```bash
 # Create a new PRP-focused project
 specify init context-kit-demo --workflow prp --ai claude
 
 # Initialize in the current folder, merging files when necessary
 specify init . --workflow free-style --ai copilot --force
-`
+```
 
 During init you will choose:
 
@@ -82,7 +82,8 @@ The CLI writes .context-eng/workflow.json with the selected workflow, assistant,
 | Command | Workflow(s) | Purpose |
 |---------|-------------|---------|
 | /specify | All | Bootstrap the workflow, populate the primary artifact using the correct template, and recommend next steps. |
-| /research | Free-Style, PRP | Capture signals, links, and risks in esearch.md. |
+| /research | Free-Style, PRP | Capture signals, links, and risks in 
+research.md. |
 | /create-plan | Free-Style | Generate a cross-layer implementation plan (plan.md) with full checklist coverage. |
 | /generate-prp | PRP | Transform INITIAL briefs into per-feature PRPs using .context-eng/workflows/prp/templates/prp-template.md. |
 | /execute-prp | PRP | Convert the PRP into actionable tasks and plan updates. |
@@ -90,71 +91,106 @@ The CLI writes .context-eng/workflow.json with the selected workflow, assistant,
 | /implement | All | Execute tasks while keeping plan/PRP notes synchronized and reporting validation evidence. |
 | /clarify, /analyze, /tasks | All (optional) | Targeted clarifications, cross-artifact analysis, and task generation. |
 
-Slash command prompts now call workflow-aware helper scripts:
+Slash command prompts call workflow-aware helper scripts:
 
-- scripts/bash/context-feature-info.sh / scripts/powershell/context-feature-info.ps1
-- scripts/bash/context-plan-setup.sh / scripts/powershell/context-plan-setup.ps1
+- `scripts/bash/context-feature-info.sh` / `scripts/powershell/context-feature-info.ps1`
+- `scripts/bash/context-plan-setup.sh` / `scripts/powershell/context-plan-setup.ps1`
 
-These scripts read .context-eng/workflow.json, set CONTEXT_FEATURE, and emit standardized JSON describing active artifacts (PRIMARY_FILE, PLAN_FILE, PRP_FILE, TASKS_FILE).
+These scripts:
+- Read `.context-eng/workflow.json` to determine the active workflow
+- Set `CONTEXT_FEATURE=<NNN-slug>` environment variable
+- Emit standardized JSON describing active artifacts (`PRIMARY_FILE`, `PLAN_FILE`, `PRP_FILE`, `TASKS_FILE`)
+- Support both `.context-eng/` (new) and `.specify/` (legacy) directory structures
 
 ## Directory Layout
 
-`
-.<project>/
-├── .context-eng/
-│   ├── workflow.json
+The Context Engineering Kit uses a dual directory structure:
+
+- **`.context-eng/`** – Configuration, templates, scripts, and workflow metadata (hidden directory)
+- **`context-eng/`** – Workspace for execution artifacts like plans and records (visible directory)
+
+```
+<project>/
+├── .context-eng/                    # Configuration & templates (hidden)
+│   ├── workflow.json                # Active workflow selection
 │   ├── checklists/
 │   │   └── full-implementation-checklist.md
-│   ├── workflows/
+│   ├── workflows/                   # Workflow-specific templates
 │   │   ├── free-style/
 │   │   ├── prp/
 │   │   └── all-in-one/
-│   └── scripts/
-│       ├── context-feature-info.sh
-│       ├── context-plan-setup.sh
-│       └── update-agent-context.sh
-├── specs/
-│   └── 001-example/context-spec.md
-├── PRPs/
+│   └── scripts/                     # Helper automation scripts
+│       ├── context-feature-info.sh  # (also .ps1)
+│       ├── context-plan-setup.sh    # (also .ps1)
+│       └── update-agent-context.sh  # (also .ps1)
+├── specs/                           # Context specifications (free-style)
+│   └── 001-example/
+│       └── context-spec.md
+├── PRPs/                            # Product Requirement Prompts (PRP workflow)
 │   ├── INITIAL.md
 │   └── 002-example.md
-└── context-eng/
+└── context-eng/                     # Execution workspace (visible)
     ├── prp/
-    │   └── 002-example/plan.md
+    │   └── 002-example/
+    │       ├── plan.md
+    │       ├── research.md
+    │       └── tasks.md
     └── all-in-one/
-        └── 003-example/record.md
-`
+        └── 003-example/
+            └── record.md
+```
 
-All helper scripts write absolute paths and set CONTEXT_FEATURE=<NNN-slug> for downstream commands.
+**Note**: Legacy projects may still use `.specify/` instead of `.context-eng/` for configuration. The CLI supports both for backwards compatibility.
+
+All helper scripts write absolute paths and set `CONTEXT_FEATURE=<NNN-slug>` for downstream commands.
 
 ## Automation & Scripts
 
-- scripts/bash/common.sh / scripts/powershell/common.ps1 expose cross-platform helpers to read workflow metadata and compute artifact paths.
-- scripts/bash/create-new-feature.sh and its PowerShell twin set up branches, copy workflow templates, and emit JSON used by /specify.
-- scripts/bash/check-prerequisites.sh and scripts/powershell/check-prerequisites.ps1 validate that required artifacts exist (primary file, plan, tasks) before running commands like /implement or /analyze.
-- Agent context updaters now source .context-eng/templates/agent-file-template.md and work across all assistants.
+- `scripts/bash/common.sh` / `scripts/powershell/common.ps1` expose cross-platform helpers to read workflow metadata and compute artifact paths.
+- `scripts/bash/create-new-feature.sh` and its PowerShell twin set up branches, copy workflow templates, and emit JSON used by `/specify`.
+- `scripts/bash/check-prerequisites.sh` and `scripts/powershell/check-prerequisites.ps1` validate that required artifacts exist (primary file, plan, tasks) before running commands like `/implement` or `/analyze`.
+- Agent context updaters now source `.context-eng/templates/agent-file-template.md` and work across all assistants.
 
 ## Multi-Agent Support
 
-Agent directories remain the same (.claude/, .gemini/, .cursor/, .github/prompts/, etc.), but prompts now reference .context-eng/scripts/... instead of .specify/scripts/.... The packaging pipeline rewrites script paths automatically per agent and script flavor.
+The Context Engineering Kit supports multiple AI coding assistants:
+
+| Agent | Key | Directory | CLI Tool | Type |
+|-------|-----|-----------|----------|------|
+| GitHub Copilot | `copilot` | `.github/prompts/` | N/A | IDE-based |
+| Claude Code | `claude` | `.claude/commands/` | `claude` | CLI |
+| Gemini CLI | `gemini` | `.gemini/commands/` | `gemini` | CLI |
+| Cursor | `cursor` | `.cursor/commands/` | `cursor-agent` | IDE-based |
+| Qwen Code | `qwen` | `.qwen/commands/` | `qwen` | CLI |
+| opencode | `opencode` | `.opencode/command/` | `opencode` | CLI |
+| Codex CLI | `codex` | `.codex/prompts/` | `codex` | CLI |
+| Windsurf | `windsurf` | `.windsurf/workflows/` | N/A | IDE-based |
+| Kilo Code | `kilocode` | `.kilocode/commands/` | `kilocode` | CLI |
+| Auggie CLI | `auggie` | `.augment/commands/` | `auggie` | CLI |
+| Roo Code | `roo` | `.roo/commands/` | `roo` | CLI |
+
+Slash commands reference `.context-eng/scripts/` (new) with backwards compatibility for `.specify/scripts/` (legacy). The packaging pipeline rewrites script paths automatically per agent and script flavor.
 
 ## Release Packaging
 
-./.github/workflows/scripts/create-release-packages.sh builds release artifacts named:
+`.github/workflows/scripts/create-release-packages.sh` builds release artifacts named:
 
-`
+```
 .genreleases/ce-kit-template-<agent>-<sh|ps>-vX.Y.Z.zip
-`
+```
 
 Each archive contains:
 
-- .context-eng/ templates, checklists, scripts, and workflow metadata.
-- Agent-specific prompts/commands generated from 	emplates/commands/*.md.
-- Optional helper files (e.g., GEMINI.md, QWEN.md) when agents require them.
+- `.context-eng/` templates, checklists, scripts, and workflow metadata
+- Agent-specific prompts/commands generated from `templates/commands/*.md`
+- Optional helper files (e.g., GEMINI.md, QWEN.md) when agents require them
 
-create-github-release.sh uploads these packages via gh release create.
+`create-github-release.sh` uploads these packages via `gh release create`.
+
+**Backwards Compatibility**: The CLI will fall back to legacy `spec-kit-template-*` archives if `ce-kit-template-*` packages are not found in the release.
 
 ## Changelog & License
 
 - Version history lives in [CHANGELOG.md](./CHANGELOG.md). Current release: **0.0.18**.
 - Licensed under the [MIT License](./LICENSE).
+
